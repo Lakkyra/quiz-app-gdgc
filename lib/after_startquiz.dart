@@ -149,6 +149,32 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24),
           ),
+          const SizedBox(height: 30),
+                  ...List.generate(_currentQuestion!.options.length, (index) {
+                    // Add option labels (A, B, C, D, ...)
+                    final optionLabel = String.fromCharCode(65 + index); // 65 is 'A'
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                        '$optionLabel. ',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        ),
+                        Expanded(
+                        child: Text(
+                          _currentQuestion!.options[index],
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        ),
+                      ],
+                      ),
+                    );
+                  }),
           const Divider(height: 48),
           Text(
             _leaderboard.isEmpty ? 'Waiting for answers...' : 'Live Leaderboard',
