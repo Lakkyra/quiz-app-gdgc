@@ -32,22 +32,24 @@ class QuizFirstPage extends StatelessWidget {
                   _buildPrimaryButton(
                     text: 'Enter the Quiz',
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>  EnterQuizCodeScreen(),
-                      ));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EnterQuizCodeScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 20),
 
-                  // Button for Hosts to log in or sign up.
-                  _buildSecondaryButton(
-                    text: 'Host the Quiz',
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const QuizSecondPage(),
-                      ));
-                    },
-                  ),
+                  //Button for Hosts to log in or sign up.
+                  // _buildSecondaryButton(
+                  //   text: 'Host the Quiz',
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //       builder: (context) => const QuizSecondPage(),
+                  //     ));
+                  //   },
+                  // ),
                 ],
               ),
             ),
@@ -58,8 +60,10 @@ class QuizFirstPage extends StatelessWidget {
   }
 
   /// Builds the primary action button with a solid background.
-  Widget _buildPrimaryButton(
-      {required String text, required VoidCallback onPressed}) {
+  Widget _buildPrimaryButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -68,8 +72,9 @@ class QuizFirstPage extends StatelessWidget {
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
           elevation: 5,
         ),
         child: Text(
@@ -81,8 +86,10 @@ class QuizFirstPage extends StatelessWidget {
   }
 
   /// Builds the secondary action button with an outline style.
-  Widget _buildSecondaryButton(
-      {required String text, required VoidCallback onPressed}) {
+  Widget _buildSecondaryButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
@@ -91,8 +98,9 @@ class QuizFirstPage extends StatelessWidget {
           foregroundColor: Colors.black,
           padding: const EdgeInsets.symmetric(vertical: 16),
           side: const BorderSide(color: Colors.black, width: 1.5),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
         child: Text(
           text,
