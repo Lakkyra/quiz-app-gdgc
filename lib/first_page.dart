@@ -42,14 +42,16 @@ class QuizFirstPage extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   //Button for Hosts to log in or sign up.
-                  // _buildSecondaryButton(
-                  //   text: 'Host the Quiz',
-                  //   onPressed: () {
-                  //     Navigator.of(context).push(MaterialPageRoute(
-                  //       builder: (context) => const QuizSecondPage(),
-                  //     ));
-                  //   },
-                  // ),
+                  _buildSecondaryButton(
+                    text: 'Host the Quiz',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const QuizSecondPage(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
