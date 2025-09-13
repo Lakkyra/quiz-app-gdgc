@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_app/auth/live_models.dart';
 import 'package:quiz_app/auth/socket_service.dart';
 import 'package:quiz_app/client/pages/leaderboard.dart';
-import 'package:quiz_app/login.dart'; 
+import 'package:quiz_app/login.dart';
 
 class HostQuestionScreen extends StatefulWidget {
   // We can pass the initial question from the lobby to prevent a loading flicker
@@ -53,7 +53,9 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
     });
 
     // Listen for leaderboard updates after a question is finished
-    _leaderboardSubscription = _socketService.leaderboardUpdates.listen((leaderboard) {
+    _leaderboardSubscription = _socketService.leaderboardUpdates.listen((
+      leaderboard,
+    ) {
       setState(() => _leaderboard = leaderboard);
     });
 
@@ -91,16 +93,18 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
 
   void _showErrorDialog(String message) {
     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              title: const Text('Error'),
-              content: Text(message),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('OK'))
-              ],
-            ));
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   // --- UI BUILD ---
@@ -129,9 +133,10 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 6))
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
         ],
       ),
       child: Column(
@@ -149,9 +154,37 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24),
           ),
+          const SizedBox(height: 30),
+          ...List.generate(_currentQuestion!.options.length, (index) {
+            // Add option labels (A, B, C, D, ...)
+            final optionLabel = String.fromCharCode(65 + index); // 65 is 'A'
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$optionLabel. ',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      _currentQuestion!.options[index],
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
           const Divider(height: 48),
           Text(
-            _leaderboard.isEmpty ? 'Waiting for answers...' : 'Live Leaderboard',
+            _leaderboard.isEmpty
+                ? 'Waiting for answers...'
+                : 'Live Leaderboard',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
@@ -161,16 +194,19 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
           ElevatedButton(
             onPressed: _isLoadingNext ? null : _handleNextQuestion,
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30))),
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
             child: _isLoadingNext
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(color: Colors.white))
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
                 : const Text('Next Question'),
           ),
         ],
@@ -182,7 +218,9 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
     return SizedBox(
       height: 200, // Adjusted height
       child: _leaderboard.isEmpty
-          ? const Center(child: Text("Scores will appear here after the question."))
+          ? const Center(
+              child: Text("Scores will appear here after the question."),
+            )
           : ListView.builder(
               itemCount: _leaderboard.length,
               itemBuilder: (context, index) {
@@ -190,8 +228,10 @@ class _HostQuestionScreenState extends State<HostQuestionScreen> {
                 return ListTile(
                   leading: CircleAvatar(child: Text('${index + 1}')),
                   title: Text(player.name),
-                  trailing: Text('${player.score} pts',
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  trailing: Text(
+                    '${player.score} pts',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 );
               },
             ),
