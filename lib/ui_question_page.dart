@@ -7,6 +7,7 @@ import 'package:quiz_app/login.dart';
 // Assuming QuizPageTemplate is in here
 
 // --- DATA MODELS ---
+
 class Question {
   String text;
   List<String> options;
