@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/admin_page.dart';
 import 'package:quiz_app/auth/auth_service.dart'; // Make sure this path is correct
 import 'package:quiz_app/signup.dart';
-import 'package:quiz_app/ui_question_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -44,9 +44,9 @@ class _LoginPageState extends State<LoginPage> {
 
       // 3. Navigate to the welcome page on success
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const QuizCreationPage()),
-      );
+        Navigator.of(
+          context,
+        ).pushReplacement(MaterialPageRoute(builder: (_) => const AdminPage()));
       }
     } on AuthException catch (e) {
       // 4. Show a user-friendly error dialog on failure
@@ -83,7 +83,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return QuizPageTemplate(
-      child: Form( // Wrap the column with a Form widget
+      child: Form(
+        // Wrap the column with a Form widget
         key: _formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -92,7 +93,11 @@ class _LoginPageState extends State<LoginPage> {
             const Text(
               'Login',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: Colors.black),
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(height: 40),
             _buildEmailField(),
@@ -158,10 +163,15 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[700],
+          ),
         ),
         const SizedBox(height: 8),
-        TextFormField( // Changed from TextField to TextFormField
+        TextFormField(
+          // Changed from TextField to TextFormField
           controller: controller,
           obscureText: isObscure,
           keyboardType: keyboardType,
@@ -170,7 +180,10 @@ class _LoginPageState extends State<LoginPage> {
             hintText: hint,
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
@@ -196,7 +209,9 @@ class _LoginPageState extends State<LoginPage> {
   /// Builds the main "Login" button with loading state.
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: _isLoading ? null : _handleLogin, // Disable button when loading
+      onPressed: _isLoading
+          ? null
+          : _handleLogin, // Disable button when loading
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -205,7 +220,8 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 5,
       ),
       child: _isLoading
-          ? const CircularProgressIndicator( // Show loading indicator
+          ? const CircularProgressIndicator(
+              // Show loading indicator
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             )
           : const Text(
@@ -219,9 +235,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildSignUpPrompt(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const SignUpPage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const SignUpPage()));
       },
       child: RichText(
         textAlign: TextAlign.center,
@@ -231,7 +247,10 @@ class _LoginPageState extends State<LoginPage> {
             TextSpan(text: "Don't have an account? "),
             TextSpan(
               text: 'Sign Up',
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -239,7 +258,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
 
 // --- TEMPLATE WIDGET (Keep this in its own file and import it) ---
 class QuizPageTemplate extends StatelessWidget {

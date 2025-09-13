@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/adminquiz.dart';
 import 'package:quiz_app/auth/auth_service.dart';
 import 'package:quiz_app/auth/live_quizservice.dart';
 import 'package:quiz_app/auth/quiz_service.dart';
@@ -11,7 +12,11 @@ class Question {
   List<String> options;
   int correctIndex;
 
-  Question({required this.text, required this.options, required this.correctIndex});
+  Question({
+    required this.text,
+    required this.options,
+    required this.correctIndex,
+  });
 
   Map<String, dynamic> toJson() {
     return {'text': text, 'options': options, 'correctIndex': correctIndex};
@@ -31,8 +36,10 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
   final _formKey = GlobalKey<FormState>();
   final _quizTitleController = TextEditingController();
   final _questionController = TextEditingController();
-  final List<TextEditingController> _optionControllers =
-      List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _optionControllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
   int? _selectedCorrectIndex;
   final List<Question> _questions = [];
   int _currentQuestionIndex = 0;
@@ -60,6 +67,41 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
     }
   }
 
+  Future<void> saveQuiz() async {
+    if (_quizTitleController.text.trim().isEmpty) {
+      _showErrorDialog('Please provide a title for your quiz.');
+      return;
+    }
+    if (_questions.isEmpty) {
+      _showErrorDialog('Please add at least one question.');
+      return;
+    }
+
+    setState(() => _isSavingAndHosting = true);
+
+    try {
+      final questionsPayload = _questions.map((q) => q.toJson()).toList();
+      final quizData = await QuizService.instance.createQuiz(
+        title: _quizTitleController.text.trim(),
+        questions: questionsPayload,
+      );
+      final newQuizId = quizData['quiz']['_id'];
+
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => Adminquiz(joinCode: newQuizId)),
+        );
+        _clearFullForm();
+      }
+    } catch (e) {
+      _showErrorDialog(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() => _isSavingAndHosting = false);
+      }
+    }
+  }
+
   Future<void> _saveQuizAndHost() async {
     if (_quizTitleController.text.trim().isEmpty) {
       _showErrorDialog('Please provide a title for your quiz.');
@@ -80,7 +122,9 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
       );
       final newQuizId = quizData['quiz']['_id'];
 
-      final sessionData = await LiveSessionService.instance.createSession(quizId: newQuizId);
+      final sessionData = await LiveSessionService.instance.createSession(
+        quizId: newQuizId,
+      );
 
       if (mounted) {
         Navigator.of(context).push(
@@ -180,7 +224,12 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
       builder: (_) => AlertDialog(
         title: const Text('Error'),
         content: Text(message),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
@@ -270,8 +319,9 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
             label: Text('${index + 1}'),
             backgroundColor: isSelected ? Colors.black : Colors.white,
             labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontWeight: FontWeight.bold),
+              color: isSelected ? Colors.white : Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
             onPressed: () => _navigateToQuestion(index),
             side: BorderSide(color: Colors.grey.shade400),
           );
@@ -295,7 +345,7 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
               icon: Icon(Icons.delete_outline, color: Colors.red.shade700),
               onPressed: _deleteCurrentQuestion,
               tooltip: 'Delete this question',
-            )
+            ),
         ],
       ),
     );
@@ -304,47 +354,55 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
   Widget _buildQuestionForm() {
     return Form(
       key: _formKey,
-      child: Column(children: [
-        TextFormField(
-          controller: _questionController,
-          decoration: InputDecoration(
-            hintText: 'Enter question text...',
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _questionController,
+            decoration: InputDecoration(
+              hintText: 'Enter question text...',
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            validator: (v) =>
+                (v == null || v.isEmpty) ? 'Question text is required' : null,
+            maxLines: 3,
           ),
-          validator: (v) => (v == null || v.isEmpty) ? 'Question text is required' : null,
-          maxLines: 3,
-        ),
-        const SizedBox(height: 16),
-        ...List.generate(4, (index) {
-          bool isSelected = _selectedCorrectIndex == index;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0),
-            child: TextFormField(
-              controller: _optionControllers[index],
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                hintText: 'Option ${String.fromCharCode(65 + index)}',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                suffixIcon: IconButton(
-                  icon: Icon(
+          const SizedBox(height: 16),
+          ...List.generate(4, (index) {
+            bool isSelected = _selectedCorrectIndex == index;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: TextFormField(
+                controller: _optionControllers[index],
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintText: 'Option ${String.fromCharCode(65 + index)}',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
                       isSelected
                           ? Icons.check_circle
                           : Icons.radio_button_unchecked,
-                      color: isSelected ? Colors.green : Colors.grey),
-                  onPressed: () => setState(() => _selectedCorrectIndex = index),
+                      color: isSelected ? Colors.green : Colors.grey,
+                    ),
+                    onPressed: () =>
+                        setState(() => _selectedCorrectIndex = index),
+                  ),
                 ),
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Option is required' : null,
               ),
-              validator: (v) => (v == null || v.isEmpty) ? 'Option is required' : null,
-            ),
-          );
-        }),
-      ]),
+            );
+          }),
+        ],
+      ),
     );
   }
 
@@ -358,34 +416,43 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
             foregroundColor: Colors.black,
             padding: const EdgeInsets.symmetric(vertical: 16),
             side: const BorderSide(color: Colors.black, width: 1.5),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
           ),
-          child: const Text('Save & Add Next',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          child: const Text(
+            'Save & Add Next',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
         const SizedBox(height: 16),
         ElevatedButton(
           onPressed: (_isSavingAndHosting || _questions.isEmpty)
               ? null
-              : _saveQuizAndHost,
+              : saveQuiz,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
           ),
           child: _isSavingAndHosting
               ? const SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 3))
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
               : Text(
                   'Finish & Host Quiz (${_questions.length}Q)',
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
         ),
       ],
