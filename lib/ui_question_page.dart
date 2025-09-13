@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/adminquiz.dart';
 import 'package:quiz_app/auth/auth_service.dart';
-import 'package:quiz_app/auth/live_quizservice.dart';
+
 import 'package:quiz_app/auth/quiz_service.dart';
 import 'package:quiz_app/login.dart';
-import 'package:quiz_app/quiz_created.dart'; // Assuming QuizPageTemplate is in here
+// Assuming QuizPageTemplate is in here
 
 // --- DATA MODELS ---
 class Question {
@@ -90,51 +90,6 @@ class _QuizCreationPageState extends State<QuizCreationPage> {
       if (mounted) {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => Adminquiz(joinCode: newQuizId)),
-        );
-        _clearFullForm();
-      }
-    } catch (e) {
-      _showErrorDialog(e.toString());
-    } finally {
-      if (mounted) {
-        setState(() => _isSavingAndHosting = false);
-      }
-    }
-  }
-
-  Future<void> _saveQuizAndHost() async {
-    if (_quizTitleController.text.trim().isEmpty) {
-      _showErrorDialog('Please provide a title for your quiz.');
-      return;
-    }
-    if (_questions.isEmpty) {
-      _showErrorDialog('Please add at least one question.');
-      return;
-    }
-
-    setState(() => _isSavingAndHosting = true);
-
-    try {
-      final questionsPayload = _questions.map((q) => q.toJson()).toList();
-      final quizData = await QuizService.instance.createQuiz(
-        title: _quizTitleController.text.trim(),
-        questions: questionsPayload,
-      );
-      final newQuizId = quizData['quiz']['_id'];
-
-      final sessionData = await LiveSessionService.instance.createSession(
-        quizId: newQuizId,
-      );
-
-      if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => HostLobbyScreen(
-              sessionId: sessionData['sessionId'],
-              hostKey: sessionData['hostKey'],
-              joinCode: sessionData['code'],
-            ),
-          ),
         );
         _clearFullForm();
       }
